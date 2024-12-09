@@ -1,58 +1,91 @@
-# DATA-ANALYSIS
-# Customer Churn Analysis
+from google.colab import drive
+drive.mount('/content/path')
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+path=('/content/path/MyDrive/csv files/customer_churn_data.csv')
+df=pd.read_csv(path)
+df.head()
+df.shape
+df.info()
+df.isnull().sum()
+mode=df['InternetService'].mode()[0]
+df['InternetService'].fillna(mode)
+df['Gender'].unique(),df['ContractType'].unique(),df['InternetService'].unique(),df['TechSupport'].unique(),df['Churn'].unique()
+for col in ['Gender', 'ContractType', 'InternetService', 'TechSupport', 'Churn']:
+    df[col] = df[col].astype(str)
+plt.figure(figsize=(15, 10))
+plt.subplot(2, 3, 1)
+plt.hist(df['Gender'])
+plt.title('Gender Distribution')
+plt.subplot(2, 3, 2)
+plt.hist(df['ContractType'])
+plt.title('Contract Type Distribution')
+plt.subplot(2, 3, 3)
+plt.hist(df['InternetService'])
+plt.title('Internet Service Distribution')
+plt.subplot(2, 3, 4)
+plt.hist(df['TechSupport'])
+plt.title('Tech Support Distribution')
+plt.subplot(2, 3, 5)
+plt.hist(df['Churn'])
+plt.title('Churn Distribution')
+plt.tight_layout()
+sns.barplot(x='Gender', y='Age',hue='InternetService' ,data=df)
+sns.scatterplot(x='Age', y='MonthlyCharges', hue='Churn', data=df)
+sns.violinplot(x='Churn', y='Age', data=df)
+sns.boxplot(x='InternetService', y='Age', data=df)
+sns.boxplot(x='Churn', y='Age', data=df)
+sns.countplot(x='InternetService', hue='Churn', data=df)
+sns.countplot(x='ContractType', hue='Churn', data=df)
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+categorical_features = ['Gender', 'ContractType', 'InternetService', 'TechSupport']
+df_encoded = pd.get_dummies(df, columns=categorical_features, drop_first=True)
+X = df_encoded.drop('Churn', axis=1)
+y = df_encoded['Churn']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model = LogisticRegression(random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy}")
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+categorical_features = ['Gender', 'ContractType', 'InternetService', 'TechSupport']
+df_encoded = pd.get_dummies(df, columns=categorical_features, drop_first=True)
+X = df_encoded.drop('Churn', axis=1)
+y = df_encoded['Churn']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model = DecisionTreeClassifier(random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy}")
+print("Predicted Values:")
+print(y_pred)
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+categorical_features = ['Gender', 'ContractType', 'InternetService', 'TechSupport']
+df_encoded = pd.get_dummies(df, columns=categorical_features, drop_first=True)
+X = df_encoded.drop('Churn', axis=1)
+y = df_encoded['Churn']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy}")
+results_df = pd.DataFrame({'Actual Churn': y_test, 'Predicted Churn': y_pred})
+results_df = pd.concat([X_test, results_df], axis=1)print(results_df)
 
-This project focuses on analyzing customer churn to help businesses identify patterns and reasons why customers discontinue their services. By understanding the factors contributing to churn, businesses can implement strategies to improve customer retention.
 
-## Project Objectives
-The primary goals of this project are:
-- To identify key factors influencing customer churn.
-- To analyze patterns and trends in customer behavior.
-- To visualize data for actionable insights.
-- To build predictive models (if applicable) to forecast churn probabilities.
 
-## Project Workflow
-1. **Data Understanding**: 
-   - The project begins by exploring the dataset, understanding its structure, and identifying important features.
-   - Key questions include:
-     - What is the churn rate?
-     - Are there correlations between customer attributes (e.g., tenure, contract type) and churn?
 
-2. **Data Preprocessing**:
-   - Handles missing values and prepares the data for analysis.
-   - Encodes categorical variables and scales numerical features where necessary.
 
-3. **Exploratory Data Analysis (EDA)**:
-   - Visualizes trends using bar charts, histograms, heatmaps, and other tools.
-   - Explores the relationship between features such as contract type, monthly charges, tenure, and churn.
 
-4. **Modeling (if applicable)**:
-   - Predictive models are built to classify customers as churned or retained.
-   - Models such as logistic regression, decision trees, or random forests can be employed.
-   - Performance is evaluated using metrics like accuracy, precision, recall, and F1-score.
 
-5. **Insights and Recommendations**:
-   - Summarizes findings to provide actionable business strategies.
-   - Example: If long-term contracts reduce churn, consider promoting such plans to high-risk customers.
 
-## Key Insights
-- **Customer Demographics**: Certain customer segments (e.g., short-tenure customers, high monthly charges) are more likely to churn.
-- **Service-Related Factors**: Features such as contract type, internet service quality, and customer support heavily influence retention.
-- **Behavioral Trends**: Customers with higher engagement in bundled services tend to have lower churn rates.
 
-## Technologies Used
-This project leverages the following tools and libraries:
-- **Python** for programming.
-- **Pandas** and **NumPy** for data manipulation.
-- **Matplotlib** and **Seaborn** for data visualization.
-- (Optional) Machine learning frameworks like **scikit-learn** for predictive modeling.
-
-## Dataset
-The dataset contains customer information such as:
-- Demographics: Gender, age group, etc.
-- Subscription details: Contract type, payment method, monthly charges.
-- Behavioral data: Usage patterns, complaints, and more.
-
-## How to Run
-1. Install required dependencies:
-   ```bash
-   pip install pandas numpy matplotlib seaborn
